@@ -89,11 +89,11 @@ def main():
         # driver.execute_script("window.scrollTo(520, 500);")
               # driver.execute_script("arguments[0].click();", element)
                 # # 検索結果の一番上の会社名を取得
-        elements = []
+        # elements = []
         elements = driver.find_elements_by_class_name("a-link-normal a-text-normal")
-        for element in elements:
+        # for element in elements:
             # elem_url.append(element.get_attribute("href"))
-            print(element)
+        print(elements)
 
             # # 空のDataFrame作成
             #     df = pd.DataFrame()
