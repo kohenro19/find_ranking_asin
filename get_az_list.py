@@ -14,7 +14,7 @@ def set_driver(driver_path, headless_flg):
     else:
       options = Options()
 
-    # ヘッドレスモード（画面非表示モード）をの設定
+    # ヘッドレスモード（画面非表示モード）を設定
     if headless_flg == True:
         options.add_argument('--headless')
 
@@ -93,7 +93,11 @@ def main():
         # elements = driver.find_elements_by_class_name("a-link-normal a-text-normal")
         elements = driver.find_elements_by_css_selector(".a-link-normal.a-text-normal")
         links= [elem.get_attribute('href') for elem in elements]
-        print(links)
+        prices = driver.find_elements_by_css_selector("span.a-price-whole")
+        price_link = [price.get_attribute("textContent") for price in prices]
+        print(price_link)
+        # for link, price in zip(links, prices):
+        #     print(link, price)
 
             # # 空のDataFrame作成
             #     df = pd.DataFrame()
