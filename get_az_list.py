@@ -90,10 +90,10 @@ def main():
               # driver.execute_script("arguments[0].click();", element)
                 # # 検索結果の一番上の会社名を取得
         # elements = []
-        elements = driver.find_elements_by_class_name("a-link-normal a-text-normal")
-        # for element in elements:
-            # elem_url.append(element.get_attribute("href"))
-        print(elements)
+        # elements = driver.find_elements_by_class_name("a-link-normal a-text-normal")
+        elements = driver.find_elements_by_css_selector(".a-link-normal.a-text-normal")
+        links= [elem.get_attribute('href') for elem in elements]
+        print(links)
 
             # # 空のDataFrame作成
             #     df = pd.DataFrame()
