@@ -3,6 +3,7 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 import time
+import sqlite3
 
 # Chromeを起動する関数
 
@@ -54,13 +55,21 @@ def search_word(asni):
     search_bar.send_keys(asni)
     driver.find_element_by_css_selector("#nav-search-submit-button").click()
 
-    # elements = driver.find_elements_by_class_name("a-link-normal.a-text-normal")
-    elements = driver.find_elements_by_xpath('.//a[@class="a-link-normal a-text-normal"]')
-    urls = [element.get_attribute("href") for element in elements]
-    print(urls)
-    time.sleep(5)
-        
 
+    product_num = 0
+    while product_num <= 300:
+        elements = driver.find_elements_by_css_selector(".a-size-mini.a-spacing-none.a-color-base.s-line-clamp-4 > a")
+        product_num = len(elements) + product_num
+
+        for element in elements:
+            print(element.get_attribute("href"))
+        
+        next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
+
+        driver.get(next_page_url)
+        time.sleep(5)
+
+ 
 
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
