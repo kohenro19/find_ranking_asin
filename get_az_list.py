@@ -3,7 +3,6 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 import time
-import pandas as pd
 
 # Chromeを起動する関数
 
@@ -31,94 +30,38 @@ def set_driver(driver_path, headless_flg):
         return Chrome(executable_path=os.getcwd() + "/" + driver_path,options=options)
     else:
         return Firefox(executable_path=os.getcwd()  + "/" + driver_path,options=options)
-
-
-def searchWords():
-    inputWord = ""
-    checkStart = ""
-    checkStop = ""
-    searchWords = []
-
-    while checkStart.upper() != "Y" or checkStart.upper() != "Q":
-        checkStart = input("検索ツールを起動しますか。起動する場合：Y、中止する場合：Qと入力してください：")
-        if checkStart.upper() == "Q":
-            exit()
-        elif checkStart.upper() == "Y":
-            break
-
-    while True:
-        inputWord = input("検索ワードを入力してください。：")
-        searchWords.append(inputWord)
-        checkStop = input("入力を続けますか。続ける場合：Y、中止する場合：Qと入力してください：")
-        if checkStop.upper() == "Q":
-            break
-    
-    return searchWords
-
 # main処理
-def main():
-    # temp_keyword = []
-    # temp_keyword = searchWords()
-    # # temp_keyword = ["高収入", "テレワーク", "愛知"]
-    # for search_keyword in temp_keyword:
+def read_csv():
+    pass
 
-        # driverを起動
-        if os.name == 'nt': #Windows
-            driver = set_driver("chromedriver.exe", False)
-        elif os.name == 'posix': #Mac
-            driver = set_driver("chromedriver", False)
-        # Webサイトを開く
-        driver.get("https://www.amazon.co.jp/s?me=AED21HEND7FER&marketplaceID=A1VC38T7YXB528")
-        # time.sleep(5)
-        # # ポップアップを閉じる
-        # driver.execute_script('document.querySelector(".karte-close").click()')
-        # time.sleep(5)
-        # # ポップアップを閉じる
-        # driver.execute_script('document.querySelector(".karte-close").click()')
+def write_csv():
+    pass
+    
+def search_word(asni):
+    # driverを起動
+    
+    if os.name == 'nt': #Windows
+        driver = set_driver("chromedriver.exe", False)
+    elif os.name == 'posix': #Mac
+        driver = set_driver("chromedriver", False)
 
-        # # 検索窓に入力
-        # driver.find_element_by_class_name(
-        #     "topSearch__text").send_keys(search_keyword)
-        # # 検索ボタンクリック
-        # driver.find_element_by_class_name("topSearch__button").click()
+    # Webサイトを開く
+    driver.get("https://www.amazon.co.jp/")
+    time.sleep(5)
+    
+    
+    search_bar = driver.find_element_by_name("field-keywords")
+    search_bar.send_keys(asni)
+    driver.find_element_by_css_selector("#nav-search-submit-button").click()
 
-        # while True:
-        #     try:
-                # ページ終了まで繰り返し取得
-                # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # driver.execute_script("window.scrollTo(520, 500);")
-              # driver.execute_script("arguments[0].click();", element)
-                # # 検索結果の一番上の会社名を取得
-        # elements = []
-        # elements = driver.find_elements_by_class_name("a-link-normal a-text-normal")
-        elements = driver.find_elements_by_css_selector(".a-link-normal.a-text-normal")
-        links= [elem.get_attribute('href') for elem in elements]
-        prices = driver.find_elements_by_css_selector("span.a-price-whole")
-        price_link = [price.get_attribute("textContent") for price in prices]
-        print(price_link)
-        # for link, price in zip(links, prices):
-        #     print(link, price)
-
-            # # 空のDataFrame作成
-            #     df = pd.DataFrame()
-
-            # # 1ページ分繰り返し
-            #     print(len(name_list))
-            #     for name in name_list:
-            #         print(name.text)
-            #         # DataFrameに対して辞書形式でデータを追加する
-            #         df = df.append(
-            #             {"会社名": name.text, 
-            #                 "項目B": "",
-            #                 "項目C": ""}, 
-            #                 ignore_index=True)
-            #     df.to_csv('to_csv_out.csv', mode="a")
-            #     url = driver.find_element_by_class_name("iconFont--arrowLeft").get_attribute("href")
-            #     driver.get(url) 
-            # except:
-            #     break
+    # elements = driver.find_elements_by_class_name("a-link-normal.a-text-normal")
+    elements = driver.find_elements_by_xpath('.//a[@class="a-link-normal a-text-normal"]')
+    urls = [element.get_attribute("href") for element in elements]
+    print(urls)
+    time.sleep(5)
+        
 
 
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
-     main()
+     search_word("イヤホン")
