@@ -85,11 +85,13 @@ def search_az(asni):
     global product_list
     product_list = []
     
+    df = pd.DataFrame()
+    
     while product_num <= 300:
         elements = driver.find_elements_by_css_selector(".a-size-mini.a-spacing-none.a-color-base.s-line-clamp-4 > a")
         product_num = len(elements) + product_num
 
-        df = pd.DataFrame()
+
         for element in elements:
             # DataFrameに対して辞書形式でデータを追加する
             d = {"URL": element.get_attribute("href")}
@@ -100,8 +102,8 @@ def search_az(asni):
         driver.get(next_page_url)
 
 
-        # df.to_csv('to_csv_out.csv', mode="a")
-        print(df.URL)
+    df.to_csv('to_csv_out.csv', mode="a")
+    print(df.URL)
             
     time.sleep(5)
         
