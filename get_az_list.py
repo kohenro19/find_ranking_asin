@@ -100,14 +100,18 @@ def search_az(asni):
         # step to the next page
         next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
         driver.get(next_page_url)
-
+        time.sleep(5)
+        driver.close
 
     df.to_csv('to_csv_out.csv', mode="a")
-    print(df.URL)
+    # print(df.URL)
+    
+    df = df[df['URL'].str.contains('B097PJP7BV')]
+    print(df.index.values.tolist())
             
-    time.sleep(5)
+
         
-    driver.close
+    
 
  
 
