@@ -3,11 +3,40 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 import time
-import sqlite3
+import sqlalchemy
+import pandas as pd
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import session, sessionmaker
+ 
 
+def con_sql():
+    engine = sqlalchemy.create_engine('sqlite:///sample_db.sqlite3', echo=True)
+    Base = declarative_base()
+    
+
+    class Fruit(Base):
+        __tablename__ = 'fruit'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(String(length=255))
+
+
+
+    Base.metadata.create_all(engine)
+    
+    Session = sqlalchemy.orm.sessionmaker(bind=engine)
+    session = Session()
+    
+    # p1 = Fruit(name='Banana')
+    # session.add(p1)
+    # session.commit()
+    
+    query_result = session.query(Fruit)
+    for fruit in query_result:
+        print(fruit.name)
+    
 # Chromeを起動する関数
-
-
 def set_driver(driver_path, headless_flg):
     if "chrome" in driver_path:
           options = ChromeOptions()
@@ -31,14 +60,10 @@ def set_driver(driver_path, headless_flg):
         return Chrome(executable_path=os.getcwd() + "/" + driver_path,options=options)
     else:
         return Firefox(executable_path=os.getcwd()  + "/" + driver_path,options=options)
-# main処理
-def read_csv():
-    pass
 
-def write_csv():
-    pass
+
     
-def search_word(asni):
+def search_az(asni):
     # driverを起動
     
     if os.name == 'nt': #Windows
@@ -57,20 +82,34 @@ def search_word(asni):
 
 
     product_num = 0
+    global product_list
+    product_list = []
+    
     while product_num <= 300:
         elements = driver.find_elements_by_css_selector(".a-size-mini.a-spacing-none.a-color-base.s-line-clamp-4 > a")
         product_num = len(elements) + product_num
 
+        df = pd.DataFrame()
         for element in elements:
-            print(element.get_attribute("href"))
-        
+            # DataFrameに対して辞書形式でデータを追加する
+            d = {"URL": element.get_attribute("href")}
+            df = df.append(d, ignore_index=True)
+            
+        # step to the next page
         next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
-
         driver.get(next_page_url)
-        time.sleep(5)
+
+
+        # df.to_csv('to_csv_out.csv', mode="a")
+        print(df.URL)
+            
+    time.sleep(5)
+        
+    driver.close
 
  
 
-# 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
+# # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
-     search_word("イヤホン")
+     search_az("イヤホン")
+    #  con_sql()
