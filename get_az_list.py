@@ -14,27 +14,25 @@ def con_sql():
     engine = sqlalchemy.create_engine('sqlite:///sample_db.sqlite3', echo=True)
     Base = declarative_base()
     
-
-    class Fruit(Base):
-        __tablename__ = 'fruit'
+    class Az(Base):
+        __tablename__ = 'az_table'
 
         id = Column(Integer, primary_key=True)
-        name = Column(String(length=255))
-
-
-
+        ansi = Column(String(length=255))
+        result = Column(Integer)
+        
     Base.metadata.create_all(engine)
     
     Session = sqlalchemy.orm.sessionmaker(bind=engine)
     session = Session()
     
-    # p1 = Fruit(name='Banana')
-    # session.add(p1)
-    # session.commit()
+    az = Az(ansi='A097PJP7B2')
+    session.add(az)
+    session.commit()
+
     
-    query_result = session.query(Fruit)
-    for fruit in query_result:
-        print(fruit.name)
+    # ansi_list = [az_table.ansi for az_table in query_result]
+    # print(ansi_list)
     
 # Chromeを起動する関数
 def set_driver(driver_path, headless_flg):
@@ -117,5 +115,5 @@ def search_az(asni):
 
 # # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
-     search_az("イヤホン")
-    #  con_sql()
+    #  search_az("イヤホン")
+     con_sql()
