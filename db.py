@@ -13,7 +13,7 @@ from selenium.webdriver.firefox.options import Options
 
 
 USER = 'root'
-PASSWORD = 'xxxxxxxxxx'
+PASSWORD = 'mynumber19!!'
 HOST = '127.0.0.1'
 DATABASE = 'azdb'
 
@@ -107,15 +107,20 @@ def search_az():
                 d = {"URL": element.get_attribute("href")}
                 df = df.append(d, ignore_index=True)
                 
-            # step to the next page
-            next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
-            if not next_page_url == '':
-                break
-                
-            driver.get(next_page_url)
-            time.sleep(1)
 
-            df.to_csv('to_csv_out.csv', mode="a")
+            try:
+            #ページ切り替え処理
+                next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
+
+                driver.get(next_page_url)
+                df.to_csv('to_csv_out.csv', mode="a")
+                time.sleep(1)
+            except:
+                print("ページなし、終了")
+                break               
+
+
+
         # print(df.URL)
         
         # df = df[df['URL'].str.contains()]
