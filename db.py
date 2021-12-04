@@ -30,17 +30,20 @@ def get_keyword():
         # birthday = Column(String)
         # address = Column(String)
         # deptcode = Column(String)
+        asin = Column(String)
         keyword = Column(String)
         
     Session=sessionmaker(engine)
     session=Session()
 
     keyword_list = []
+    asin_list = []
+    
     for r in session.query(Az):
         keyword_list.append(r.keyword)
+        asin_list.append(r.asin)
 
-
-    return keyword_list
+    return keyword_list, asin_list
 
 def set_driver(driver_path, headless_flg):
     if "chrome" in driver_path:
@@ -78,9 +81,9 @@ def search_az():
 
 
     
-    keywords = get_keyword()
+    keywords, asins = get_keyword()
     
-    for keyword in keywords:
+    for keyword, asin in zip(keywords, asins):
         # Webサイトを開く
         driver.get("https://www.amazon.co.jp/")
         time.sleep(1)
@@ -123,12 +126,17 @@ def search_az():
 
         # print(df.URL)
         
-        # df = df[df['URL'].str.contains()]
-        # ansi_line = df.index.values.tolist()
+        df = df[df['URL'].str.contains(asin)]
+        ranking = df.index.values.tolist()
+        print(ranking)
+        
+        # insert_ranking_to_db():
+        #     pass
+            
 
-                
-
-
+def insert_db(ranking):
+    pass
+               
 # # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
     search_az()
