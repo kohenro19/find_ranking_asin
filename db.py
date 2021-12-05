@@ -10,40 +10,53 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 
-
-
 USER = 'root'
-PASSWORD = 'mynumber19!!'
+PASSWORD = 'aaaa'
 HOST = '127.0.0.1'
 DATABASE = 'azdb'
 
+engine=create_engine(f'mysql+mysqlconnector://{USER}:{PASSWORD}@{HOST}/{DATABASE}')
+Base = declarative_base()
+Session=sessionmaker(engine)
+session=Session()
+
 def get_keyword():
     # MySQL Connector/Pythonを使うためmysqlconnectorを指定する
-    engine=create_engine(f'mysql+mysqlconnector://{USER}:{PASSWORD}@{HOST}/{DATABASE}')
 
-    Base = declarative_base()
+    keyword_list = []
+    asin_list = []
 
     class Az(Base):
         __tablename__ = 'keyword_ranking_requests'
         id = Column(String, primary_key=True)
-        # name = Column(String)
-        # birthday = Column(String)
-        # address = Column(String)
-        # deptcode = Column(String)
         asin = Column(String)
         keyword = Column(String)
-        
-    Session=sessionmaker(engine)
-    session=Session()
 
-    keyword_list = []
-    asin_list = []
-    
     for r in session.query(Az):
         keyword_list.append(r.keyword)
         asin_list.append(r.asin)
 
     return keyword_list, asin_list
+
+def insert_data(asin_value, keyword_value, ranking_value): 
+    class Keyword_ranking(Base):
+        __tablename__ = 'keyword_ranking'
+        __table_args__ = {'extend_existing': True}
+        id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+        asin = Column(String)
+        keyword = Column(String)
+        ranking = Column(Integer)
+        ymd = Column(Integer)
+        updated_at = Column(String)
+        created_at = Column(String)
+        
+  
+    # tmp = Keyword_ranking(id=id_value, asin=asin_value, keyword=keyword_value, ranking=ranking_value, ymd="20211205", updated_at="20211205", created_at="20211205")
+    tmp = Keyword_ranking(asin=asin_value, keyword=keyword_value, ranking=ranking_value, ymd="20211205", updated_at="20211205", created_at="20211205")
+
+    session.add(tmp)
+    session.commit()
+
 
 def set_driver(driver_path, headless_flg):
     if "chrome" in driver_path:
@@ -69,21 +82,19 @@ def set_driver(driver_path, headless_flg):
     else:
         return Firefox(executable_path=os.getcwd()  + "/" + driver_path,options=options)
 
-
-    
 def search_az():
     # driverを起動
-    
+    ids = 0
     if os.name == 'nt': #Windows
         driver = set_driver("chromedriver.exe", False)
     elif os.name == 'posix': #Mac
         driver = set_driver("chromedriver", False)
 
-
-    
     keywords, asins = get_keyword()
     
     for keyword, asin in zip(keywords, asins):
+
+        ids = ids + 1
         # Webサイトを開く
         driver.get("https://www.amazon.co.jp/")
         time.sleep(1)
@@ -95,8 +106,8 @@ def search_az():
 
 
         product_num = 0
-        global product_list
-        product_list = []
+        # global product_list
+        # product_list = []
         
         df = pd.DataFrame()
         
@@ -116,27 +127,22 @@ def search_az():
                 next_page_url = driver.find_element_by_css_selector(".a-last > a").get_attribute("href")
 
                 driver.get(next_page_url)
-                df.to_csv('to_csv_out.csv', mode="a")
+                df.to_csv('to_csv_out.csv', mode="w")
                 time.sleep(1)
             except:
                 print("ページなし、終了")
                 break               
 
-
-
-        # print(df.URL)
-        
         df = df[df['URL'].str.contains(asin)]
         ranking = df.index.values.tolist()
         print(ranking)
-        
-        # insert_ranking_to_db():
-        #     pass
+
+        insert_data(asin, keyword, ranking[0])      
             
 
-def insert_db(ranking):
-    pass
+
                
 # # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
     search_az()
+    
