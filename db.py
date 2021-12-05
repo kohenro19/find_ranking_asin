@@ -133,11 +133,18 @@ def search_az():
                 print("ページなし、終了")
                 break               
 
-        df = df[df['URL'].str.contains(asin)]
-        ranking = df.index.values.tolist()
-        print(ranking)
 
-        insert_data(asin, keyword, ranking[0])      
+        print(df[df['URL'].str.contains(asin)])
+
+        ranking = df.index.values.tolist()
+       
+        print(ranking)
+        if ranking == 0:
+            insert_data(asin, keyword, ranking[0])   
+        else:
+            ranking[0] = 0
+            insert_data(asin, keyword, ranking[0])   
+
             
 
 
